@@ -1,0 +1,125 @@
+<!doctype html>
+<!--
+  Isula Poterie — business card (85 x 55 mm), "Atelier blanc" design.
+
+  HOW TO EDIT
+  - Text: change the lines marked "EDIT" below (name, email, website).
+  - Colours: change the variables in :root.
+  - Preview: open this file in a browser. Dashed line = where the card is cut;
+    the lighter band outside it is the 3 mm bleed (printed, then cut off).
+  - Export: double-click export-card.bat (high-quality PNGs of both sides).
+
+  Layout is drawn at 10 px = 1 mm: each side is 910 x 610 px
+  = 85 x 55 mm card + 3 mm bleed on every side (30 px).
+-->
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Isula Poterie — Carte de visite</title>
+<style>
+@font-face { font-family: "Almendra"; src: url("../website/assets/fonts/almendra-bold.ttf") format("truetype"); font-weight: 700; }
+@font-face { font-family: "Zalando"; src: url("../website/assets/fonts/zalando-sans-semiexpanded.ttf") format("truetype"); font-weight: 100 900; }
+
+:root {
+  --dark: #1c1c21;
+  --light: #ecebf0;
+  --teal: #4ab0bf;         /* logo */
+  --teal-strong: #008896;  /* bottom stripe, rule under the name */
+  --bleed: 30px;           /* 3 mm */
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; font-family: Zalando, sans-serif; }
+
+/* ---------- Card sides ---------- */
+.side {
+  position: relative;
+  width: 910px;
+  height: 610px;
+  overflow: hidden;
+}
+.crk-dark  { background: var(--dark)  url("../branding/textures/crackle-dark.svg")  center / 425px 425px; color: var(--light); }
+.crk-light { background: var(--light) url("../branding/textures/crackle-light.svg") center / 425px 425px; color: var(--dark); }
+.trim { position: absolute; inset: var(--bleed); }   /* the visible card, 850 x 550 */
+.mark { display: block; width: auto; }
+
+/* Front */
+.front .trim { display: flex; align-items: center; justify-content: center; gap: 40px; }
+.front .mark { height: 270px; fill: var(--teal); }
+.wordmark-1 { margin: 0; font-family: Almendra, serif; font-weight: 700; font-size: 153px; line-height: 0.85; }
+.wordmark-2 { margin: 14px 0 0 6px; font-weight: 700; font-size: 44px; letter-spacing: 0.22em; }
+.stripe { position: absolute; left: 0; right: 0; bottom: 0; height: calc(var(--bleed) + 8.5px); background: var(--teal-strong); }
+
+/* Back */
+.glaze {
+  position: absolute; top: 0; bottom: 0; left: 0; width: 335px;
+  background: url("glaze.png") 40% 55% / cover;
+  clip-path: polygon(0 0, 100% 0, 62.3% 100%, 0 100%);
+}
+.back .trim { left: calc(var(--bleed) + 298px); padding: 62px 57px 57px 11px; display: flex; flex-direction: column; justify-content: space-between; }
+.back .mark { height: 77px; align-self: flex-end; fill: var(--dark); }
+.name { margin: 0; font-weight: 600; font-size: 34px; letter-spacing: 0.14em; }
+.rule { display: block; width: 80px; height: 3px; background: var(--teal-strong); margin: 26px 0 28px; }
+.contact { margin: 0 0 8px; font-weight: 300; font-size: 24px; }
+
+/* ---------- Screen preview ---------- */
+@media screen {
+  body { min-height: 100vh; background: #cfcfd6; display: flex; flex-wrap: wrap; gap: 48px; align-items: center; justify-content: center; padding: 48px 16px; }
+  .side { zoom: min(1, calc((100vw - 32px) / 910px)); box-shadow: 0 2px 4px rgba(28,28,33,.18), 0 24px 60px rgba(28,28,33,.35); }
+  .side::after { content: ""; position: absolute; inset: var(--bleed); outline: 2px dashed rgba(207,207,214,.9); box-shadow: 0 0 0 var(--bleed) rgba(207,207,214,.45); pointer-events: none; }
+  /* PNG export (card.html?side=front|back): one side, trimmed, at the top left */
+  html.png body { display: block; min-height: 0; padding: 0; overflow: hidden; }
+  html.png-front, html.png-front body { background: var(--dark); }   /* no white at the edges */
+  html.png-back,  html.png-back  body { background: var(--light); }
+  html.png { overflow: hidden; }
+  /* Pinned to the viewport so the 850 x 550 card fills the image exactly, edge to edge */
+  html.png .side { zoom: 1; position: fixed; top: calc(-1 * var(--bleed)); left: calc(-1 * var(--bleed)); box-shadow: none; }
+  html.png .side::after { display: none; }
+  html.png-front .back, html.png-back .front { display: none; }
+}
+
+/* ---------- Print / PDF: one side per page, with bleed ---------- */
+@media print {
+  @page { size: 91mm 61mm; margin: 0; }
+  .side { zoom: 0.3779527559; break-after: page; }  /* 10 px -> 1 mm */
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+</style>
+<script>
+  var side = new URLSearchParams(location.search).get("side");
+  if (side === "front" || side === "back") document.documentElement.className = "png png-" + side;
+</script>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="logo" viewBox="0 0 820 2000"><path fill-rule="evenodd" d="M711 0H820V1990L10 777L718 293ZM725 418L770 1785L103 777Z"/></symbol>
+</svg>
+
+<!-- ===== FRONT (recto) ===== -->
+<section class="side front crk-dark" aria-label="Recto">
+  <div class="trim">
+    <svg class="mark" viewBox="0 0 820 2000" aria-hidden="true"><use href="#logo"/></svg>
+    <div translate="no">
+      <p class="wordmark-1">Isula</p>
+      <p class="wordmark-2">POTERIE</p>
+    </div>
+  </div>
+  <span class="stripe"></span>
+</section>
+
+<!-- ===== BACK (verso) ===== -->
+<section class="side back crk-light" aria-label="Verso">
+  <div class="glaze" aria-hidden="true"></div>
+  <div class="trim">
+    <svg class="mark" viewBox="0 0 820 2000" aria-hidden="true"><use href="#logo"/></svg>
+    <div>
+      <p class="name">KATIA PERSECHINO</p>                 <!-- EDIT: name -->
+      <span class="rule"></span>
+      <p class="contact">isulapoterie@yahoo.com</p>         <!-- EDIT: email -->
+      <p class="contact">www.isulapoterie.com</p>           <!-- EDIT: website (add a <p class="contact"> line for a phone number) -->
+    </div>
+  </div>
+</section>
+</body>
+</html>

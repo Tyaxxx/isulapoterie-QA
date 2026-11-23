@@ -1,0 +1,29 @@
+# --- Outside the website (not published) ---
+archives/
+business-card/export/
+
+# --- Original photos (may contain EXIF/GPS; the site uses the cleaned copies in website/photos/) ---
+photo-sources/*
+!photo-sources/README.txt
+
+# --- Tools / editors ---
+.claude/
+.vscode/
+.idea/
+node_modules/
+*.log
+
+# --- System files ---
+Thumbs.db
+ehthumbs.db
+desktop.ini
+.DS_Store
+$RECYCLE.BIN/
+
+# --- Heavy working files ---
+*.psd
+*.zip
+
+# --- Generated locally ---
+photo-comparison.html
+tools/.cache/
