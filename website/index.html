@@ -10,7 +10,9 @@
 <link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="assets/images/favicon.ico" sizes="16x16 32x32 48x48">
 <link rel="apple-touch-icon" href="assets/images/apple-touch-icon.png">
+<script>(function(d){try{if(!matchMedia("(prefers-reduced-motion: reduce)").matches)d.documentElement.classList.add("intro-on")}catch(e){}})(document)</script>
 <link rel="preload" href="assets/fonts/zalando-sans-semiexpanded.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="preload" href="assets/fonts/almendra-bold.ttf" as="font" type="font/ttf" crossorigin>
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
@@ -24,6 +26,14 @@
   <symbol id="i-expand" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.5" d="M4 10V4h6M20 14v6h-6M4 4l6 6M20 20l-6-6"/></symbol>
   <symbol id="i-menu" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.5"><line x1="4" y1="8" x2="20" y2="8"/><line x1="8" y1="16" x2="20" y2="16"/></g></symbol>
 </svg>
+
+<div class="intro-overlay">
+  <div class="intro-stage" aria-hidden="true">
+    <div class="intro-crackle"></div>
+    <div class="intro-mark"><svg class="intro-logo" viewBox="0 0 820 2000"><use href="#i-logo"/></svg></div>
+    <p class="intro-word" translate="no"><span class="intro-isula">Isula</span><span class="intro-poterie">Poterie</span></p>
+  </div>
+</div>
 
 <a href="#contenu" class="skip">Aller au contenu</a>
 
@@ -156,6 +166,7 @@
 </dialog>
 
 <script src="photos/photos.js"></script>
+<script src="assets/js/intro.js" defer onerror="var o=document.querySelector('.intro-overlay');if(o)o.remove();document.documentElement.classList.remove('intro-on','intro-lock')"></script>
 <script src="assets/js/site.js" defer></script>
 </body>
 </html>

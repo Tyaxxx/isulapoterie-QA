@@ -185,7 +185,8 @@ a:focus-visible, button:focus-visible { outline: 2px solid var(--teal-strong); o
 .slideshow-track { flex: 1; height: 1px; background: var(--line-dark); position: relative; }
 .slideshow-progress {
   position: absolute; left: 0; top: -1px; height: 3px; width: 0;
-  background: var(--teal-strong); transition: width 0.6s ease;
+  /* Ease-in-out (slow start, fast middle, soft landing) over about half of SLIDE_MS (3s in site.js). */
+  background: var(--teal-strong); transition: width 1.6s cubic-bezier(0.65, 0, 0.35, 1);
 }
 .slideshow-buttons { display: flex; gap: 8px; }
 .slideshow-play .icon-play { display: none; }
@@ -347,6 +348,120 @@ dialog:focus { outline: none; }
 .menu-nav .menu-mail {
   margin-top: 28px; padding: 0; border: 0; color: var(--teal); font-weight: 400; font-size: 18px;
   min-height: 44px; display: inline-flex; align-items: center; align-self: flex-start;
+}
+
+/* ---------- Intro (assets/js/intro.js) ----------
+   Shown only when the <head> gate adds html.intro-on. Timeline (3.5 s, from .is-playing):
+   0–0.35 settle · 0.28–0.63 cracks draw · 0.63–1.54 shatter · 1.05–1.9 texture + wordmark ·
+   1.54–2.45 drift · 2.45–3.5 shards fly out, overlay fades. */
+.intro-overlay { display: none; }
+html.intro-on .intro-overlay {
+  display: block; position: fixed; inset: 0; z-index: 100;
+  /* Last-resort backstop if the script never runs: gone by ~6.4 s.
+     Keep above LATE_START_MS in intro.js (5.5 s), which skips the intro if the script starts later. */
+  animation: intro-failsafe 0.4s 6s forwards;
+}
+html.intro-on .intro-overlay.is-playing { animation: intro-exit 1.05s 2.45s forwards; }
+/* Keep the scrollbar's space so the page doesn't shift sideways when the lock is lifted. */
+html.intro-lock { overflow: hidden; scrollbar-gutter: stable; }
+
+.intro-stage {
+  position: absolute; inset: 0; overflow: hidden;
+  display: grid; place-items: center;
+  background: var(--dark);
+}
+.intro-stage > * { grid-area: 1 / 1; }
+.intro-crackle {
+  position: absolute; inset: 0;
+  background-image: url("../images/crackle-dark.svg");
+  background-size: 640px 640px;
+  opacity: 0;
+}
+.intro-mark {
+  position: relative;
+  height: min(46vh, 380px); aspect-ratio: 820 / 2000;
+  /* Before play the static logo shows slightly smaller (never a blank overlay); it settles on play. */
+  transform: scale(0.96);
+}
+.intro-overlay.is-playing .intro-mark { animation: intro-settle 0.35s ease-out both; }
+.intro-logo, .intro-shard, .intro-cracks {
+  position: absolute; inset: 0; width: 100%; height: 100%; display: block; overflow: visible;
+}
+.intro-shard { animation: intro-shard 2.85s calc(0.63s + var(--d, 0ms) * 1.4) both; }
+.intro-crack {
+  fill: none; stroke: var(--teal-pale); stroke-width: 6; stroke-linecap: round;
+  stroke-dasharray: 1; stroke-dashoffset: 1; opacity: 0.9;
+}
+.intro-overlay.is-playing .intro-logo { animation: intro-hide 0s 0.63s forwards; }
+.intro-overlay.is-playing .intro-crack { animation: intro-crack 1.26s linear both; }
+.intro-overlay.is-playing .intro-crackle { animation: intro-crackle 2.45s 1.05s ease-out both; }
+.intro-overlay.is-playing .intro-shard, .intro-overlay.is-playing .intro-crackle { will-change: transform, opacity; }
+
+.intro-word {
+  position: relative; margin: min(26vh, 214px) 0 0; text-align: center;
+  color: var(--light); text-shadow: 0 2px 24px var(--dark), 0 0 2px var(--dark);
+}
+.intro-isula, .intro-poterie { display: block; opacity: 0; }
+.intro-isula {
+  font-family: Almendra, serif; font-weight: 700;
+  font-size: clamp(56px, 11vw, 128px); line-height: 0.85;
+}
+.intro-poterie {
+  margin-top: 0.9em; padding-left: 0.22em; /* balance the trailing letter-spacing */
+  font-weight: 700; font-size: clamp(13px, 1.6vw, 18px);
+  letter-spacing: 0.22em; text-transform: uppercase; color: var(--teal);
+}
+.intro-overlay.is-playing .intro-isula { animation: intro-word 2.45s 1.05s ease-out both; }
+.intro-overlay.is-playing .intro-poterie { animation: intro-word 2.31s 1.19s ease-out both; }
+
+@keyframes intro-failsafe { to { opacity: 0; visibility: hidden; } }
+@keyframes intro-exit { to { opacity: 0; } }
+@keyframes intro-hide { to { visibility: hidden; } }
+@keyframes intro-settle {
+  from { transform: scale(0.96); }
+  to { transform: none; }
+}
+@keyframes intro-crack {
+  0%, 22% { stroke-dashoffset: 1; opacity: 0.9; }
+  50%, 55% { stroke-dashoffset: 0; opacity: 0.9; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+/* Starts at 0.63 s: jolt, shatter (to 1.54 s), drift (to 2.45 s), fly out (to 3.5 s). */
+@keyframes intro-shard {
+  0% { transform: none; }
+  2.5% { transform: translate(1.5px, -1px); }
+  5% { transform: translate(-1px, 1px); }
+  6.8% { transform: none; animation-timing-function: cubic-bezier(0.16, 0.84, 0.3, 1); }
+  31.7% {
+    transform: translate(var(--tx), var(--ty)) rotate(var(--rot)) scale(var(--s));
+    animation-timing-function: ease-in-out;
+  }
+  63.4% {
+    opacity: 1;
+    transform: translate(calc(var(--tx) * 1.1), calc(var(--ty) * 1.1)) rotate(calc(var(--rot) * 1.15)) scale(var(--s));
+    animation-timing-function: cubic-bezier(0.55, 0, 0.8, 0.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(var(--tx) * 2.5), calc(var(--ty) * 2.5)) rotate(calc(var(--rot) * 1.6)) scale(var(--s));
+  }
+}
+@keyframes intro-crackle {
+  0% { opacity: 0; transform: scale(1.04); }
+  34%, 57% { opacity: 1; transform: none; }
+  100% { opacity: 1; transform: scale(1.08); }
+}
+@keyframes intro-word {
+  0% { opacity: 0; transform: translateY(12px); }
+  34%, 57% { opacity: 1; transform: none; }
+  100% { opacity: 0; transform: none; }
+}
+
+@media (max-width: 720px) {
+  .intro-crackle { background-size: 480px 480px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .intro-overlay { display: none !important; }
 }
 
 /* ---------- ≤ 900px: 2-column grid ---------- */

@@ -126,4 +126,12 @@ Tests (Node.js 20 or later, `node:test`, no dependency):
 node --test tests/
 ```
 
-`tests/generate-photos.test.mjs` tests the `photos.js` generator. `tests/correct-photos.test.mjs` tests the correction on synthetic images created by `tests/images.ps1`, then on the 42 real photos.
+`tests/generate-photos.test.mjs` tests the `photos.js` generator. `tests/correct-photos.test.mjs` tests the correction on synthetic images created by `tests/images.ps1`, then on the 42 real photos. `tests/intro-geometry.test.mjs` tests the intro's shatter geometry.
+
+### Intro animation
+
+On every page load, a 3.5 s intro plays over the page: the logo cracks and shatters, the crackle texture and the "Isula / Poterie" wordmark appear, then the pieces fly out and the site is revealed. It cannot be skipped.
+
+- A tiny script in `<head>` of `index.html` adds `html.intro-on` only if `prefers-reduced-motion` is not set (on Windows: Settings → Accessibility → Visual effects → Animation effects off means no intro).
+- `website/assets/js/intro.js` builds the shards (`shatter()`, deterministic: tune `seed`, `impact`, `rays`, `rings` defaults there) and removes the overlay when done. Timings are in the "Intro" section of `style.css`.
+- Failure is never visible: if `intro.js` fails to load (`onerror` on its script tag), throws, the logo symbol is missing or the crackle texture fails to load, the overlay is removed at once. A CSS backstop hides it after ~6 s if no script runs at all. A background tab skips it.
